@@ -15,15 +15,19 @@
 
 #include <SOIL.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include "Shader.h"
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
 const GLuint WIDTH = 800, HEIGHT = 600;
 
+GLfloat mixValue = 0.2f;
+
 int main(int argc, const char * argv[]) {
-  // insert code here...
-  std::cout << "Hello, World!\n";
 
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -132,7 +136,6 @@ int main(int argc, const char * argv[]) {
   SOIL_free_image_data(image);
   glBindTexture(GL_TEXTURE_2D, 0);
 
-
   while (!glfwWindowShouldClose(window)) {
     glfwPollEvents();
 
@@ -142,6 +145,7 @@ int main(int argc, const char * argv[]) {
     // Draw our first triangle
     ourShader.Use();
 
+
     // Bind Textures using texture units
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture1);
@@ -149,6 +153,30 @@ int main(int argc, const char * argv[]) {
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, texture2);
     glUniform1i(glGetUniformLocation(ourShader.Program, "ourTexture2"), 1);
+
+    glUniform1f(glGetUniformLocation(ourShader.Program, "mixValue"), mixValue);
+
+    glm::mat4 trans;
+    // 旋转+缩放
+//    trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
+//    trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
+//    std::cout << vec.x << " " << vec.y << " " << vec.z << std::endl;
+
+    // 随时间变化
+    trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+    trans = glm::rotate(trans, glm::radians((GLfloat)glfwGetTime() * 50.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+    glUniformMatrix4fv(glGetUniformLocation(ourShader.Program, "transform"), 1, GL_FALSE, glm::value_ptr(trans));
+
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+    trans = glm::mat4();
+    trans = glm::translate(trans, glm::vec3(-0.5f, 0.5f, 0.0f));
+    GLfloat s = sin(glfwGetTime());
+    trans = glm::scale(trans, glm::vec3(s, s, s));
+
+    glUniformMatrix4fv(glGetUniformLocation(ourShader.Program, "transform"), 1, GL_FALSE, glm::value_ptr(trans));
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -168,4 +196,17 @@ int main(int argc, const char * argv[]) {
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
     glfwSetWindowShouldClose(window, GL_TRUE);
+
+  if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
+    mixValue += 0.1f;
+    if (mixValue >= 1.0f)
+      mixValue = 1.0f;
+  }
+
+  if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
+    mixValue -= 0.1f;
+    if (mixValue <= 0.0f)
+      mixValue = 0.0f;
+  }
+
 }
