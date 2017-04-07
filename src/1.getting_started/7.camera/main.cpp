@@ -7,13 +7,14 @@
 //
 
 #include <iostream>
+#include <string>
 
 #define GLEW_STATIC
 #include <GL/glew.h>
 
 #include <GLFW/glfw3.h>
 
-#include <SOIL.h>
+#include <SOIL/SOIL.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -29,6 +30,12 @@ GLfloat mixValue = 0.2f;
 
 int main(int argc, const char * argv[]) {
 
+  static char const* rep = getenv("LOGL_RESOURCE_PATH");
+
+  std::string relativePath = "../../../resource/";
+  if (rep)
+    relativePath.assign(rep);
+  
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -113,7 +120,7 @@ int main(int argc, const char * argv[]) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   // Load, create texture and generate mipmaps
 
-  unsigned char* image = SOIL_load_image("pic/container.jpg", &width, &height, 0, SOIL_LOAD_RGB);
+  unsigned char* image = SOIL_load_image((relativePath + "pic/container.jpg").c_str(), &width, &height, 0, SOIL_LOAD_RGB);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
   glGenerateMipmap(GL_TEXTURE_2D);
   SOIL_free_image_data(image);
@@ -130,7 +137,7 @@ int main(int argc, const char * argv[]) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   // Load, create texture and generate mipmaps
-  image = SOIL_load_image("pic/awesomeface.png", &width, &height, 0, SOIL_LOAD_RGB);
+  image = SOIL_load_image((relativePath + "pic/awesomeface.png").c_str(), &width, &height, 0, SOIL_LOAD_RGB);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
   glGenerateMipmap(GL_TEXTURE_2D);
   SOIL_free_image_data(image);
