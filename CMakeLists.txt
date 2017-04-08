@@ -30,7 +30,7 @@ set(CHAPTERS
     )
 
 set(1.getting_started
-    7.camera)
+    5.transformations)
 
 set(2.lighting
     1.colors)
