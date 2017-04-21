@@ -148,6 +148,8 @@ int main()
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    // Activate shader
+    ourShader.Use();
 
     // Bind Textures using texture units
     glActiveTexture(GL_TEXTURE0);
@@ -157,8 +159,6 @@ int main()
     glBindTexture(GL_TEXTURE_2D, texture2);
     glUniform1i(glGetUniformLocation(ourShader.Program, "ourTexture2"), 1);
 
-    // Activate shader
-    ourShader.Use();
 
     // Create transformations
     glm::mat4 model;
