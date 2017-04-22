@@ -32,6 +32,7 @@ set(CHAPTERS
 set(1.getting_started
     5.transformations
     6.coordinate_systems
+    7.camera
     )
 
 set(2.lighting
@@ -48,7 +49,7 @@ foreach(CHAPTER ${CHAPTERS})
     set(NAME "${CHAPTER}_${DEMO}")
       message(STATUS "NAME = ${NAME}")
       message(STATUS "SOURCE = ${SOURCE}")
-    add_executable(${NAME} ${SOURCE} include/Utility.h)
+    add_executable(${NAME} ${SOURCE})
     target_link_libraries(${NAME} ${LIBS})
     set_target_properties(${NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin/${CHAPTER}")
 
