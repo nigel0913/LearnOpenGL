@@ -26,8 +26,16 @@
 // Function prototypes
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
+void do_movement();
+
 // Window dimensions
 const GLuint WIDTH = 800, HEIGHT = 600;
+glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f,  3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
+bool keys[1024];
+GLfloat deltaTime = 0.0f;   // 当前帧与上一帧的时间差
+GLfloat lastFrame = 0.0f;   // 上一帧的时间
 
 // The MAIN function, from here we start the application and run the game loop
 int main()
@@ -181,8 +189,13 @@ int main()
   // Game loop
   while (!glfwWindowShouldClose(window))
   {
+    GLfloat currentFrame = (GLfloat)glfwGetTime();
+    deltaTime = currentFrame - lastFrame;
+    lastFrame = currentFrame;
+
     // Check if any events have been activated (key pressed, mouse moved etc.) and call corresponding response functions
     glfwPollEvents();
+    do_movement();
 
     // Render
     // Clear the color buffer
@@ -207,11 +220,14 @@ int main()
     glm::mat4 projection;
     model = glm::rotate(model, glm::radians(-55.0f) /* * (GLfloat) glfwGetTime() */, glm::vec3(1.0f, 0.5f, 0.0f));
 
-    GLfloat radius = 10.0f;
-    GLfloat camX = sin(glfwGetTime()) * radius;
-    GLfloat camZ = cos(glfwGetTime()) * radius;
-    view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+//    GLfloat radius = 10.0f;
+//    GLfloat camX = sin(glfwGetTime()) * radius;
+//    GLfloat camZ = cos(glfwGetTime()) * radius;
+//    view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+
 //    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+
+    view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
     projection = glm::perspective(glm::radians(45.0f), (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 100.0f);
     // Get their uniform location
     GLint modelLoc = glGetUniformLocation(ourShader.Program, "model");
@@ -246,4 +262,22 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 {
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
     glfwSetWindowShouldClose(window, GL_TRUE);
+
+  if (action == GLFW_PRESS)
+    keys[key] = true;
+  else if (action == GLFW_RELEASE)
+    keys[key] = false;
+
+}
+
+void do_movement() {
+  GLfloat cameraSpeed = 0.5f * deltaTime;
+  if(keys[GLFW_KEY_W])
+    cameraPos += cameraSpeed * cameraFront;
+  if(keys[GLFW_KEY_S])
+    cameraPos -= cameraSpeed * cameraFront;
+  if(keys[GLFW_KEY_A])
+    cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+  if(keys[GLFW_KEY_D])
+    cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 }
